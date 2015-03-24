@@ -52,7 +52,7 @@ long readVcc() {
 void loop() {
 	if (read0) {
 		Wire.beginTransmission(1);
-		Voltage = ((analogRead(A0) / 1023.0) * Vcc) * (R2 / (R1 + R2));
+		Voltage = ((analogRead(A0) / 1023.0)) * (R2 / (R1 + R2));
 		char voltage[3] = {Voltage / 100 % 10, Voltage / 10 % 10, Voltage % 10};
 		Wire.write(voltage[0]);
 		Wire.write(voltage[1]);
@@ -61,7 +61,7 @@ void loop() {
 		Wire.endTransmission();
 	} else if (read1) {
 		Wire.beginTransmission(1);
-		Voltage = ((analogRead(A1) / 1023.0) * Vcc) * (R2 / (R1 + R2));
+		Voltage = ((analogRead(A1) / 1023.0)) * (R2 / (R1 + R2));
 		char voltage[3] = {Voltage / 100 % 10, Voltage / 10 % 10, Voltage % 10};
 		Wire.write(voltage[0]);
 		Wire.write(voltage[1]);
