@@ -125,6 +125,8 @@ void charge(char bank) {
 	dirty = 1;
 	Wire.beginTransmission(PSU);
 	Wire.write(startReading);
+	Wire.endTransmission();
+	Wire.beginTransmission(PSU);
 	if (bank == 1 || bank == 2) {
 		Wire.write(turnOn);
 	}
@@ -154,6 +156,8 @@ void charge(char bank) {
 	if (bank == 1 || bank == 2) {
 		Wire.write(turnOff);
 	}
+	Wire.endTransmission();
+	Wire.beginTransmission(PSU);
 	Wire.write(stopReading);
 	Wire.endTransmission();
 	dirty = 1;
