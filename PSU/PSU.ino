@@ -31,10 +31,11 @@ void setup() {
 	pinMode(PSUpin, OUTPUT);
 	pinMode(CHG1pin, OUTPUT);
 	pinMode(CHG2pin, OUTPUT);
+	pinMode(A0, INPUT);
+	pinMode(A1, INPUT);
 	Wire.begin(0);
 	Wire.onReceive(processRequest);
 	delay(200);
-	Vcc = readVcc()/1000.0;
 }
 
 long readVcc() {
@@ -52,7 +53,7 @@ long readVcc() {
 void loop() {
 	if (read0) {
 		Wire.beginTransmission(1);
-		Voltage = ((analogRead(A0) / 1023.0)) * (R2 / (R1 + R2));
+		Voltage = ((analogRead(A0) / 1023.0) * 5.15) / (R2 / (R1 + R2));
 		char voltage[3] = {Voltage / 100 % 10, Voltage / 10 % 10, Voltage % 10};
 		Wire.write(voltage[0]);
 		Wire.write(voltage[1]);
@@ -61,7 +62,7 @@ void loop() {
 		Wire.endTransmission();
 	} else if (read1) {
 		Wire.beginTransmission(1);
-		Voltage = ((analogRead(A1) / 1023.0)) * (R2 / (R1 + R2));
+		Voltage = ((analogRead(A1) / 1023.0) * 5.15) / (R2 / (R1 + R2));
 		char voltage[3] = {Voltage / 100 % 10, Voltage / 10 % 10, Voltage % 10};
 		Wire.write(voltage[0]);
 		Wire.write(voltage[1]);

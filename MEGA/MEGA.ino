@@ -90,6 +90,8 @@ const char VOL1off	= 'l';
 void processVoltage(int howMany) {
 	while (Wire.available() > 0) {
 		voltage = Wire.read();
+		int a = voltage;
+		Serial.println(a);
 		if (voltage != ';') {
 			Voltage[i] = voltage;
 			i++;
@@ -119,8 +121,8 @@ void charge(char bank) {
 		startReading = VOL0on;
 		stopReading = VOL0off;
 	} else if (bank == 4) {
-		startReading = VOL0on;
-		stopReading = VOL0off;
+		startReading = VOL1on;
+		stopReading = VOL1off;
 	}
 	dirty = 1;
 	Wire.beginTransmission(PSU);
