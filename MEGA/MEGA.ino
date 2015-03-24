@@ -94,7 +94,7 @@ void processVoltage(int howMany) {
 			Voltage[i] = voltage;
 			i++;
 		} else if (voltage == ';') {
-			realVoltage =
+			realVoltage = (Voltage[0] * 100 + Voltage[1] * 10 + Voltage[2]);
 			i = 0;
 		}
 	}
@@ -147,9 +147,9 @@ void charge(char bank) {
 			lcd.print("Voltage: ");
 		}
 		lcd.setCursor(9, 1);
-		lcd.print(Voltage);
+		lcd.print(realVoltage);
 		delay(80);
-	} while (state == NULL && Voltage < maxVoltage + 3);
+	} while (state == NULL && realVoltage < maxVoltage + 3);
 	Wire.beginTransmission(PSU);
 	if (bank == 1 || bank == 2) {
 		Wire.write(turnOff);
@@ -524,7 +524,7 @@ int numberSelect(char name[32], int curNumber, int minNumber, int maxNumber) {
 	lcd.clear();
 	lcd.setCursor(0, 0);
 	lcd.print(name);
-	int digits[3] = {curNumber / 100 % 10, curNumber / 10 % 10, curNumber % 10};
+	int digits[3] = {0, 0, 0};
 	char digit = 0;
 	while(digit != 3 && digit != -1) {
 		if (dirty) {
