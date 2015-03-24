@@ -41,7 +41,8 @@ char Char = NULL;
 unsigned char color[3] = {0, 0, 0};
 // Temporary vars
 int voltage;
-int Voltage;
+char Voltage[4];
+int realVoltage;
 int i = 0;
 bool curState = false;
 bool lastState = true;
@@ -90,7 +91,11 @@ void processVoltage(int howMany) {
 	while (Wire.available() > 0) {
 		voltage = Wire.read();
 		if (voltage != ';') {
-			Voltage = voltage;
+			Voltage[i] = voltage;
+			i++;
+		} else if (voltage == ';') {
+			realVoltage =
+			i = 0;
 		}
 	}
 }
