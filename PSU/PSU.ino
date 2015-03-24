@@ -22,6 +22,7 @@ const char VOL1off	= 'l';
 boolean read0 = 0;
 boolean read1 = 0;
 int Voltage = 0;
+char voltage[3] = 0;
 double Vcc;
 const double R1 = 1005000;
 const double R2 = 9950;
@@ -53,13 +54,19 @@ void loop() {
 	if (read0) {
 		Wire.beginTransmission(1);
 		Voltage = ((analogRead(A0) / 1023.0) * Vcc) * (R2 / (R1 + R2));
-		Wire.write(Voltage);
+		voltage[] = {Voltage / 100 % 10, Voltage / 10 % 10, Voltage % 10};
+		Wire.write(voltage[0]);
+		Wire.write(voltage[1]);
+		Wire.write(voltage[2]);
 		Wire.write(";");
 		Wire.endTransmission();
 	} else if (read1) {
 		Wire.beginTransmission(1);
 		Voltage = ((analogRead(A1) / 1023.0) * Vcc) * (R2 / (R1 + R2));
-		Wire.write(Voltage);
+		voltage[] = {Voltage / 100 % 10, Voltage / 10 % 10, Voltage % 10};
+		Wire.write(voltage[0]);
+		Wire.write(voltage[1]);
+		Wire.write(voltage[2]);
 		Wire.write(";");
 		Wire.endTransmission();
 	}
