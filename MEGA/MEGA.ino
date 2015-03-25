@@ -58,6 +58,8 @@ bool silentMode = 0;
 bool LEDState = 0;
 bool LOADState = 0;
 int curCharge = 0;
+int lastledd = 0;
+int maxVoltage;
 // Menus
 const char MAINMENU = 1;
 const char PSUMENU = 2;
@@ -103,7 +105,6 @@ void processVoltage(int howMany) {
 }
 
 void charge(char bank) {
-	int maxVoltage = 420;
 	char turnOn, turnOff, startReading, stopReading;
 	if (bank == 1) {
 		maxVoltage = 400;
@@ -120,11 +121,15 @@ void charge(char bank) {
 		startReading = VOL1on;
 		stopReading = VOL1off;
 	} else if (bank == 3) {
-		maxVoltage = 400;
+		if (realVoltage > maxVoltage) {
+			maxVoltage = 400;
+		}
 		startReading = VOL0on;
 		stopReading = VOL0off;
 	} else if (bank == 4) {
-		maxVoltage = 200;
+		if (realVoltage > maxVoltage) {
+			maxVoltage = 200;
+		}
 		startReading = VOL1on;
 		stopReading = VOL1off;
 	}
@@ -137,6 +142,7 @@ void charge(char bank) {
 		Wire.write(turnOn);
 	}
 	Wire.endTransmission();
+	Serial.println(maxVoltage);
 	do {
 		readKeypad();
 		if (dirty) {
@@ -166,11 +172,15 @@ void charge(char bank) {
 		} else {
 			ledd = numbers[leddd];
 		}
-		Wire.beginTransmission(LED);
-		Wire.write(ledd);
-		Wire.endTransmission();
+		if (ledd != lastledd) {
+			Wire.beginTransmission(LED);
+			Wire.write(ledd);
+			Wire.endTransmission();
+			lastledd = ledd;
+		}
 		lcd.setCursor(9, 1);
 		lcd.print(realVoltage);
+		lcd.print("V ");
 		delay(20);
 	} while (state == NULL && realVoltage < maxVoltage + 3);
 	Wire.beginTransmission(PSU);
@@ -194,6 +204,11 @@ void charge(char bank) {
 	Wire.beginTransmission(PSU);
 	Wire.write(LEDon);
 	Wire.endTransmission();
+	if (bank == 1) {
+		charge(3);
+	} else if (bank == 2) {
+		charge(4);
+	}
 	dirty = 1;
 }
 /* Arduino setup */
