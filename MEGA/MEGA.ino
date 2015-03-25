@@ -107,20 +107,24 @@ void charge(char bank) {
 	char turnOn, turnOff, startReading, stopReading;
 	if (bank == 1) {
 		maxVoltage = 400;
+		maxVoltage = numberSelect("RailGun Voltage", maxVoltage, 0, maxVoltage);
 		turnOn = CHG1on;
 		turnOff = CHG1off;
 		startReading = VOL0on;
 		stopReading = VOL0off;
 	} else if (bank == 2) {
 		maxVoltage = 200;
+		maxVoltage = numberSelect("CoilGun Voltage", maxVoltage, 0, maxVoltage);
 		turnOn = CHG2on;
 		turnOff = CHG2off;
 		startReading = VOL1on;
 		stopReading = VOL1off;
 	} else if (bank == 3) {
+		maxVoltage = 400;
 		startReading = VOL0on;
 		stopReading = VOL0off;
 	} else if (bank == 4) {
+		maxVoltage = 200;
 		startReading = VOL1on;
 		stopReading = VOL1off;
 	}
@@ -149,10 +153,25 @@ void charge(char bank) {
 			}
 			lcd.setCursor(0, 1);
 			lcd.print("Voltage: ");
+			dirty = 0;
 		}
+		int leddd = map(realVoltage, 0, maxVoltage, 0, 12);
+		char ledd = NULL;
+		if (ledd == 12) {
+			ledd = 'c';
+		} else if (leddd == 11) {
+			ledd = 'b';
+		} else if (leddd == 10) {
+			ledd = 'a';
+		} else {
+			ledd = numbers[leddd];
+		}
+		Wire.beginTransmission(LED);
+		Wire.write(ledd);
+		Wire.endTransmission();
 		lcd.setCursor(9, 1);
 		lcd.print(realVoltage);
-		delay(80);
+		delay(20);
 	} while (state == NULL && realVoltage < maxVoltage + 3);
 	Wire.beginTransmission(PSU);
 	if (bank == 1 || bank == 2) {
@@ -162,8 +181,20 @@ void charge(char bank) {
 	Wire.beginTransmission(PSU);
 	Wire.write(stopReading);
 	Wire.endTransmission();
+	Wire.beginTransmission(LED);
+	Wire.write('1');
+	Wire.endTransmission();
+	Wire.beginTransmission(LED);
+	Wire.write('0');
+	Wire.endTransmission();
+	delay(500);
+	Wire.beginTransmission(PSU);
+	Wire.write(PSUon);
+	Wire.endTransmission();
+	Wire.beginTransmission(PSU);
+	Wire.write(LEDon);
+	Wire.endTransmission();
 	dirty = 1;
-	delay(100);
 }
 /* Arduino setup */
 void setup() {
@@ -532,29 +563,25 @@ int numberSelect(char name[32], int curNumber, int minNumber, int maxNumber) {
 	lcd.print(name);
 	int digits[3] = {0, 0, 0};
 	char digit = 0;
+	dirty = 1;
 	while(digit != 3 && digit != -1) {
 		if (dirty) {
 			lcd.clear();
 			dirty = 0;
-		}
-		lcd.setCursor(0, 0);
-		lcd.print(name);
-		lcd.setCursor(0, 1);
-		if (digit == 0) {
-			lcd.print(".");
+			lcd.setCursor(0, 0);
+			lcd.print(name);
+			lcd.setCursor(0, 1);
 			lcd.print(digits[0]);
 			lcd.print(digits[1]);
 			lcd.print(digits[2]);
-		} else if (digit == 1) {
-			lcd.print(digits[0]);
-			lcd.print(".");
-			lcd.print(digits[1]);
-			lcd.print(digits[2]);
-		} else if (digit == 2) {
-			lcd.print(digits[0]);
-			lcd.print(digits[1]);
-			lcd.print(".");
-			lcd.print(digits[2]);
+			lcd.cursor();
+			if (digit == 0) {
+				lcd.setCursor(0, 1);
+			} else if (digit == 1) {
+				lcd.setCursor(1, 1);
+			} else if (digit == 2) {
+				lcd.setCursor(2, 1);
+			}
 		}
 		readKeypad();
 		if (state == '+') {
@@ -585,6 +612,7 @@ int numberSelect(char name[32], int curNumber, int minNumber, int maxNumber) {
 		}
 		delay(20);
 	}
+	lcd.noCursor();
 	dirty = 1;
 	int tmpNum = digits[0] * 100 + digits[1] * 10 + digits[2];
 	if (digit == 3) {
